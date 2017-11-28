@@ -2,3 +2,21 @@
 <title>Notes</title>
 <h1>Notes</h1>
 
+{% for message in get_flashed_messages()  %}
+  <div class=flash>{{ message }}</div>
+{% endfor %}
+
+<form name="frm" action="{{ url_for('add_entry') }}" method=post class=add-entry>
+  Text:<br>
+  <input type="text" name="text" required autofocus>
+  <input type="submit" value=Save>
+</form>
+<ul class=entries>
+ {% for entry in entries %}
+   <li>{{ entry.id }} {{ entry.time }} {{ entry.note }}
+ {% else %}
+   <li><em>No entries.</em>
+ {% endfor %}
+</ul>
+
+

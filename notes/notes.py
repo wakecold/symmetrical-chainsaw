@@ -1,15 +1,29 @@
 import sqlite3
 from flask import Flask, render_template, g, url_for, request, flash, redirect, session, \
         abort
+from time import strftime
 
 app = Flask(__name__)
 DATABASE = 'notes.db'
-
+app.secret_key = 'G\xf0\xb6D\xdd\t\\\xd5\xde\xd3\xb1\x0e\xc8\x05\x01\x1f>\xb5\x10\xbf\xb8\xber\n'
 
 @app.route('/')
-def notes():
-	return "Notes here"
+def show_entries():
+	db = get_db()
+	cur = db.execute('select id, time, note from entries order by id desc')
+	entries = cur.fetchall()
+	return render_template('notes.html', entries=entries)
 
+@app.route('/add', methods=['POST'])
+def add_entry():
+	db = get_db()
+	#not valid insert?
+	db.execute('insert into entries (time, note) values (?, ?)',
+		[strftime('%Y-%m-%d %H:%M:%S'), request.form['text']] )
+	db.commit()
+	flash('New entry was added')
+	return redirect(url_for('show_entries'))
+	
 @app.teardown_appcontext
 def close_connection(exception):
 	db = getattr(g, '_database', None)
